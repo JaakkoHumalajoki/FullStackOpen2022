@@ -13,6 +13,11 @@ const App = () => {
 
   const onSubmit = (event) => {
     event.preventDefault()
+    if (persons.find(person => person.name === newName)) {
+      // Name used as array key, thus needs to be unique
+      alert(`Person named ${newName} already exists in the phonebook`)
+      return;
+    }
     setPersons(persons.concat({ name: newName }))
     setNewName("")
   }
@@ -29,9 +34,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      <ul>
-        {persons.map(person => <li key={person.name}>{person.name}</li>)}
-      </ul>
+      {persons.map(person => <div key={person.name}>{person.name}</div>)}
     </div>
   )
 }
