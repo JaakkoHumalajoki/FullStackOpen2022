@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './Filter'
+import PersonForm from './PersonForm'
+import PersonList from './PersonList'
 let idCounter = 5;
 
 const App = () => {
@@ -24,7 +27,7 @@ const App = () => {
     setFilter(event.target.value)
   }
 
-  const onSubmit = (event) => {
+  const onFormSubmit = (event) => {
     event.preventDefault()
     if (persons.find(person => person.name === newName)) {
       alert(`Person named ${newName} already exists in the phonebook`)
@@ -45,23 +48,17 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <div>
-        filter shown with <input value={filter} onChange={changeFilterInput} />
-      </div>
-      <form>
-        <h2>Add a new</h2>
-        <div>
-          name: <input value={newName} onChange={changeNameInput} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={changeNumberInput} />
-        </div>
-        <div>
-          <button type="submit" onClick={onSubmit}>add</button>
-        </div>
-      </form>
+      <Filter value={filter} onChange={changeFilterInput} />
+      <h2>Add a new</h2>
+      <PersonForm 
+        name={newName}
+        onChangeName={changeNameInput}
+        number={newNumber}
+        onChangeNumber={changeNumberInput}
+        onSubmit={onFormSubmit}
+      />
       <h2>Numbers</h2>
-      {personsFiltered.map(person => <div key={person.id}>{person.name} {person.number}</div>)}
+      <PersonList persons={personsFiltered} />
     </div>
   )
 }
