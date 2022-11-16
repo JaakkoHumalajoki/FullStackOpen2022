@@ -1,6 +1,6 @@
 import React from "react"
 
-const Country = ({ data }) => {
+const Country = ({ data, weather }) => {
   const { capital, area } = data
   const name = data.name.common
   const flag = data.flags.png
@@ -24,6 +24,18 @@ const Country = ({ data }) => {
         alt="flag"
         style={{ boxShadow: "5px 5px 10px gray", width: "200px" }}
       />
+      {weather && (
+        <>
+          <h3>Weather in {capital}</h3>
+          <img
+            alt="weather icon"
+            src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
+            style={{ float: "left", marginTop: "-8px" }}
+          />
+          <div>Temperature {weather.main.temp} Celsius</div>
+          <div>Wind {weather.wind.speed} m/s</div>
+        </>
+      )}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import React from "react"
 import Country from "./Country"
 
-const CountryList = ({ countries, changeInput }) => {
+const CountryList = ({ countries, changeInput, weather }) => {
   if (countries === undefined) return <div>Loading from API...</div>
   if (countries.length === 0) return <div>No matching countries</div>
   if (countries.length > 10) {
@@ -10,7 +10,7 @@ const CountryList = ({ countries, changeInput }) => {
   if (countries.length === 1) {
     return (
       <div>
-        <Country data={countries[0]} />
+        <Country data={countries[0]} weather={weather} />
       </div>
     )
   }
