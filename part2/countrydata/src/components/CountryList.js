@@ -1,7 +1,7 @@
 import React from "react"
-import Country from './Country'
+import Country from "./Country"
 
-const CountryList = ({ countries }) => {
+const CountryList = ({ countries, changeInput }) => {
   if (countries === undefined) return <div>Loading from API...</div>
   if (countries.length === 0) return <div>No matching countries</div>
   if (countries.length > 10) {
@@ -14,11 +14,17 @@ const CountryList = ({ countries }) => {
       </div>
     )
   }
-  return ( // 2-10 countries
+  return (
+    // 2-10 countries
     <>
-      {countries.map((c) => (
-        <div key={c.name.common}>{c.name.common}</div>
-      ))}
+      {countries.map((c) => {
+        return (
+          <div key={c.name.common}>
+            {c.name.common}{" "}
+            <button onClick={() => changeInput(c.name.common)}>show</button>
+          </div>
+        )
+      })}
     </>
   )
 }
