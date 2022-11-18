@@ -16,7 +16,10 @@ const App = () => {
     personService
       .getAll()
       .then((data) => setPersons(data))
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        sendErrorNotification("Couldn't load data from json-server!")
+        console.log(error)
+      })
   }, [])
 
   const changeNameInput = (event) => {
@@ -33,6 +36,13 @@ const App = () => {
 
   const sendNotification = (message) => {
     setMessage({ text: message, error: false })
+    setTimeout(() => {
+      setMessage({ text: null, error: false })
+    }, 5000)
+  }
+
+  const sendErrorNotification = (message) => {
+    setMessage({ text: message, error: true })
     setTimeout(() => {
       setMessage({ text: null, error: false })
     }, 5000)
@@ -61,8 +71,14 @@ const App = () => {
           .then((data) => {
             setPersons(persons.map((p) => (p.id === data.id ? data : p)))
             sendNotification(`Updated ${updatedPerson.name}'s number`)
+            setNewName("")
+            setNewNumber("")
           })
-          .catch((error) => console.log(error))
+          .catch((error) => {
+            sendErrorNotification(`${updatedPerson.name} has already been removed from the server`)
+            setPersons(persons.filter(p => p.id !== updatedPerson.id))
+            console.log(error)
+          })
       }
       return
     }
