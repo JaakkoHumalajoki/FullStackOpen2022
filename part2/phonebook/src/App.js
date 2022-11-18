@@ -3,12 +3,14 @@ import personService from "./personService"
 import Filter from "./Filter"
 import PersonForm from "./PersonForm"
 import PersonList from "./PersonList"
+import Notification from "./Notification"
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
+  const [message, setMessage] = useState({ text: null, error: false })
 
   useEffect(() => {
     personService
@@ -27,6 +29,13 @@ const App = () => {
 
   const changeFilterInput = (event) => {
     setFilter(event.target.value)
+  }
+
+  const sendNotification = (message) => {
+    setMessage({ text: message, error: false })
+    setTimeout(() => {
+      setMessage({ text: null, error: false })
+    }, 5000)
   }
 
   const onFormSubmit = (event) => {
@@ -51,6 +60,7 @@ const App = () => {
           .update(updatedPerson)
           .then((data) => {
             setPersons(persons.map((p) => (p.id === data.id ? data : p)))
+            sendNotification(`Updated ${updatedPerson.name}'s number`)
           })
           .catch((error) => console.log(error))
       }
@@ -60,6 +70,7 @@ const App = () => {
     const person = { name: newName, number: newNumber }
     personService.create(person).then((savedPerson) => {
       setPersons(persons.concat(savedPerson))
+      sendNotification(`Added ${newName}`)
     })
 
     setNewName("")
@@ -71,6 +82,7 @@ const App = () => {
     if (!window.confirm(`Delete ${name}?`)) return
     personService.delete(id)
     setPersons(persons.filter((p) => p.id !== id))
+    sendNotification(`${person.name} removed`)
   }
 
   const personsFiltered = persons.filter((person) => {
@@ -82,6 +94,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={message} />
       <Filter value={filter} onChange={changeFilterInput} />
       <h2>Add a new</h2>
       <PersonForm
