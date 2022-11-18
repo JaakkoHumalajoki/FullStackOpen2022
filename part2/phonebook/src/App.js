@@ -1,26 +1,20 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Filter from './Filter'
-import PersonForm from './PersonForm'
-import PersonList from './PersonList'
-let idCounter = 5;
+import { useState, useEffect } from "react"
+import personService from "./personService"
+import Filter from "./Filter"
+import PersonForm from "./PersonForm"
+import PersonList from "./PersonList"
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
-  const [filter, setFilter] = useState('')
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState("")
+  const [newNumber, setNewNumber] = useState("")
+  const [filter, setFilter] = useState("")
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons")
-    .then(res => {
-      if (res.status !== 200) {
-        console.log("Axios error:", res)
-        return
-      }
-      setPersons(res.data)
-    })
-    .catch(error => console.log("Axios error:", error))
+    personService
+      .getAll()
+      .then((data) => setPersons(data))
+      .catch((error) => console.log(error))
   }, [])
 
   const changeNameInput = (event) => {
@@ -37,17 +31,25 @@ const App = () => {
 
   const onFormSubmit = (event) => {
     event.preventDefault()
-    if (persons.find(person => person.name === newName)) {
-      alert(`Person named ${newName} already exists in the phonebook`)
-      return;
+    if (!newName) {
+      alert("Name cannot be empty")
+      return
     }
-    setPersons(persons.concat({ name: newName, number: newNumber, id: idCounter }))
-    idCounter += 1
-    setNewName('')
-    setNewNumber('')
+    if (persons.find((person) => person.name === newName)) {
+      alert(`Person named ${newName} already exists in the phonebook`)
+      return
+    }
+
+    const person = { name: newName, number: newNumber }
+    personService.create(person).then((savedPerson) => {
+      setPersons(persons.concat(savedPerson))
+    })
+
+    setNewName("")
+    setNewNumber("")
   }
 
-  const personsFiltered = persons.filter(person => {
+  const personsFiltered = persons.filter((person) => {
     const lowcaseName = person.name.toLowerCase()
     const lowcaseFilter = filter.toLowerCase()
     return lowcaseName.includes(lowcaseFilter)
@@ -58,7 +60,7 @@ const App = () => {
       <h1>Phonebook</h1>
       <Filter value={filter} onChange={changeFilterInput} />
       <h2>Add a new</h2>
-      <PersonForm 
+      <PersonForm
         name={newName}
         onChangeName={changeNameInput}
         number={newNumber}
