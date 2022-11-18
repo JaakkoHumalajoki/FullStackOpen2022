@@ -35,8 +35,25 @@ const App = () => {
       alert("Name cannot be empty")
       return
     }
-    if (persons.find((person) => person.name === newName)) {
-      alert(`Person named ${newName} already exists in the phonebook`)
+    const existingPerson = persons.find((person) => person.name === newName)
+    if (existingPerson) {
+      if (
+        window.confirm(
+          `${newName} already exists in the phonebook, replace old number with a new one?`
+        )
+      ) {
+        const updatedPerson = {
+          id: existingPerson.id,
+          name: existingPerson.name,
+          number: newNumber,
+        }
+        personService
+          .update(updatedPerson)
+          .then((data) => {
+            setPersons(persons.map((p) => (p.id === data.id ? data : p)))
+          })
+          .catch((error) => console.log(error))
+      }
       return
     }
 
