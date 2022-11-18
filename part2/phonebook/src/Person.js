@@ -5,7 +5,7 @@ const Person = ({ person, deletePerson }) => {
     <div>
       {person.name} {person.number}
       <button
-        onClick={() => deletePerson(person.id)}
+        onClick={() => deletePerson(person)}
         style={{ marginLeft: "10px" }}
       >
         delete
