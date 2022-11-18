@@ -1,10 +1,12 @@
-import React from 'react'
-import Person from './Person'
+import React from "react"
+import Person from "./Person"
 
-const PersonList = ({persons}) => {
+const PersonList = ({ persons, deletePerson }) => {
   return (
     <>
-      {persons.map(person => <Person person={person} key={person.id} />)}
+      {persons.map((person) => (
+        <Person person={person} deletePerson={deletePerson} key={person.id} />
+      ))}
     </>
   )
 }

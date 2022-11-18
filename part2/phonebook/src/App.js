@@ -49,6 +49,11 @@ const App = () => {
     setNewNumber("")
   }
 
+  const handleDeletePerson = (personId) => {
+    personService.delete(personId)
+    setPersons(persons.filter(p => p.id !== personId))
+  }
+
   const personsFiltered = persons.filter((person) => {
     const lowcaseName = person.name.toLowerCase()
     const lowcaseFilter = filter.toLowerCase()
@@ -68,7 +73,7 @@ const App = () => {
         onSubmit={onFormSubmit}
       />
       <h2>Numbers</h2>
-      <PersonList persons={personsFiltered} />
+      <PersonList persons={personsFiltered} deletePerson={handleDeletePerson} />
     </div>
   )
 }
