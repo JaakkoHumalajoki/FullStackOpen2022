@@ -17,8 +17,8 @@ const App = () => {
       .getAll()
       .then((data) => setPersons(data))
       .catch((error) => {
-        sendErrorNotification("Couldn't load data from json-server!")
-        console.log(error)
+        sendErrorNotification("Couldn't load data from server")
+        console.log("Database error:", error)
       })
   }, [])
 
@@ -75,19 +75,37 @@ const App = () => {
             setNewNumber("")
           })
           .catch((error) => {
-            sendErrorNotification(`${updatedPerson.name} has already been removed from the server`)
-            setPersons(persons.filter(p => p.id !== updatedPerson.id))
-            console.log(error)
+            if (error.response?.status === 404) {
+              sendErrorNotification(
+                `${updatedPerson.name} has vanished from the server`
+              )
+              setPersons(persons.filter((p) => p.id !== updatedPerson.id))
+            } else if (error.response?.data?.error) {
+              sendErrorNotification(error.response.data.error)
+            } else {
+              sendErrorNotification("Unknown error")
+              console.log("Unknown error:", error)
+            }
           })
       }
       return
     }
 
     const person = { name: newName, number: newNumber }
-    personService.create(person).then((savedPerson) => {
-      setPersons(persons.concat(savedPerson))
-      sendNotification(`Added ${newName}`)
-    })
+    personService
+      .create(person)
+      .then((savedPerson) => {
+        setPersons(persons.concat(savedPerson))
+        sendNotification(`Added ${newName}`)
+      })
+      .catch((error) => {
+        if (error.response?.data?.error) {
+          sendErrorNotification(error.response.data.error)
+        } else {
+          sendErrorNotification("Unknown error")
+          console.log("Unknown error:", error)
+        }
+      })
 
     setNewName("")
     setNewNumber("")
