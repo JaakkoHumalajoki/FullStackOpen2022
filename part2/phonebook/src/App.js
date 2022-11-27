@@ -97,6 +97,8 @@ const App = () => {
       .then((savedPerson) => {
         setPersons(persons.concat(savedPerson))
         sendNotification(`Added ${newName}`)
+        setNewName("")
+        setNewNumber("")
       })
       .catch((error) => {
         if (error.response?.data?.error) {
@@ -106,9 +108,6 @@ const App = () => {
           console.log("Unknown error:", error)
         }
       })
-
-    setNewName("")
-    setNewNumber("")
   }
 
   const handleDeletePerson = (person) => {
