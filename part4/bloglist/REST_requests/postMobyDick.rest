@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+  "title": "Moby Dick",
+  "author": "Hermal Melville",
+  "url": "https://en.wikipedia.org/wiki/Moby-Dick",
+  "likes": 15
+}
