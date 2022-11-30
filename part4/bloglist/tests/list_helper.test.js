@@ -146,12 +146,12 @@ describe('mostBlogs', () => {
     expect(mostBlogs(emptyList)).toBe(null)
   })
   test('returns the author of single item list', () => {
-    expect(mostBlogs(listOfOne)).toBe('Hermal Melville')
+    expect(mostBlogs(listOfOne)).toEqual({ author: 'Hermal Melville', blogs: 1 })
   })
   test('returns the author with most blogs', () => {
-    expect(mostBlogs(longListWithDuplicates)).toBe('Sun Tzu')
+    expect(mostBlogs(longListWithDuplicates)).toEqual({ author: 'Sun Tzu', blogs: 3 })
   })
   test('returns null if all author names missing', () => {
-    expect(mostBlogs(listWithMissingAuthors)).toBe(null)
+    expect(mostBlogs(listWithMissingAuthors)).toEqual(null)
   })
 })

@@ -23,7 +23,6 @@ const favouriteBlog = (blogs) => {
 
 const mostBlogs = (blogs) => {
   if (!blogs || blogs.length === 0) return null
-  if (blogs.length === 1) return blogs[0].author || null
 
   const blogsByAuthor = {}
 
@@ -49,7 +48,8 @@ const mostBlogs = (blogs) => {
     }
   })
 
-  return topBlogger
+  return { author: topBlogger, blogs: topBlogCount }
+}
 }
 
 module.exports = {
