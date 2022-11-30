@@ -37,7 +37,7 @@ const listOfThree = [
 ]
 
 describe('dummy', () => {
-  test('dummy returns 1', () => {
+  test('always returns 1', () => {
     const blogs = []
 
     expect(dummy(blogs)).toBe(1)
@@ -45,27 +45,27 @@ describe('dummy', () => {
 })
 
 describe('totalLikes', () => {
-  test('totalLikes counts correct', () => {
+  test('counts correct', () => {
     expect(totalLikes(listOfThree)).toBe(40)
   })
 
-  test('totalLikes equals the likes of the only blog in array', () => {
+  test('equals the likes of the only blog in array', () => {
     expect(totalLikes(listOfOne)).toBe(15)
   })
 
-  test('totalLikes returns zero on empty array', () => {
+  test('returns zero on empty array', () => {
     expect(totalLikes(emptyList)).toBe(0)
   })
 })
 
 describe('favouriteBlog', () => {
-  test('favouriteBlog returns null on empty array', () => {
+  test('returns null on empty array', () => {
     expect(favouriteBlog(emptyList)).toBe(null)
   })
-  test('favouriteBlog returns the only blog in list', () => {
+  test('returns the only blog in list', () => {
     expect(favouriteBlog(listOfOne)).toEqual(listOfOne[0])
   })
-  test('favouriteBlog returns the most liked blog in list', () => {
+  test('returns the most liked blog in list', () => {
     expect(favouriteBlog(listOfThree)).toEqual(listOfThree[1])
   })
 })
