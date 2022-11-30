@@ -1,4 +1,4 @@
-const { dummy, totalLikes } = require('../utils/list_helper')
+const { dummy, totalLikes, favouriteBlog } = require('../utils/list_helper')
 
 const emptyList = []
 
@@ -55,5 +55,17 @@ describe('totalLikes', () => {
 
   test('totalLikes returns zero on empty array', () => {
     expect(totalLikes(emptyList)).toBe(0)
+  })
+})
+
+describe('favouriteBlog', () => {
+  test('favouriteBlog returns null on empty array', () => {
+    expect(favouriteBlog(emptyList)).toBe(null)
+  })
+  test('favouriteBlog returns the only blog in list', () => {
+    expect(favouriteBlog(listOfOne)).toEqual(listOfOne[0])
+  })
+  test('favouriteBlog returns the most liked blog in list', () => {
+    expect(favouriteBlog(listOfThree)).toEqual(listOfThree[1])
   })
 })
