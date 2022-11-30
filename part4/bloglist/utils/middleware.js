@@ -1,4 +1,5 @@
 const morgan = require('morgan')
+const logger = require('./logger')
 
 const requestLogger = morgan((tokens, req, res) => {
   return [
@@ -17,6 +18,8 @@ const unknownEndpoint = (_req, res) => {
 }
 
 const errorHandler = (err, _req, res, next) => {
+  logger.error(err.message)
+
   if (err.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
   }
