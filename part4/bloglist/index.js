@@ -2,9 +2,10 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
+const { MONGO_URL, PORT } = require('./utils/config')
 const logger = require('./utils/logger')
 const blogsRouter = require('./controllers/blogs')
-const { MONGO_URL, PORT } = require('./utils/config')
+const middleware = require('./utils/middleware')
 
 mongoose
   .connect(MONGO_URL)
@@ -13,6 +14,8 @@ mongoose
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.requestLogger)
+
 app.use('/api/blogs', blogsRouter)
 
 app.listen(PORT, () => {
