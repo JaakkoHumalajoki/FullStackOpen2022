@@ -2,10 +2,9 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-require('dotenv').config()
 const blogsRouter = require('./controllers/blogs')
+const { mongoUrl } = require('./utils/config')
 
-const mongoUrl = process.env.MONGODB_URL
 mongoose
   .connect(mongoUrl)
   .then(() => console.log('Connected to MongoDB'))
