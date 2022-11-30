@@ -2,7 +2,8 @@ const {
   dummy,
   totalLikes,
   favouriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 } = require('../utils/list_helper')
 
 const emptyList = []
@@ -146,12 +147,39 @@ describe('mostBlogs', () => {
     expect(mostBlogs(emptyList)).toBe(null)
   })
   test('returns the author of single item list', () => {
-    expect(mostBlogs(listOfOne)).toEqual({ author: 'Hermal Melville', blogs: 1 })
+    expect(mostBlogs(listOfOne)).toEqual({
+      author: 'Hermal Melville',
+      blogs: 1
+    })
   })
   test('returns the author with most blogs', () => {
-    expect(mostBlogs(longListWithDuplicates)).toEqual({ author: 'Sun Tzu', blogs: 3 })
+    expect(mostBlogs(longListWithDuplicates)).toEqual({
+      author: 'Sun Tzu',
+      blogs: 3
+    })
   })
   test('returns null if all author names missing', () => {
-    expect(mostBlogs(listWithMissingAuthors)).toEqual(null)
+    expect(mostBlogs(listWithMissingAuthors)).toBe(null)
+  })
+})
+
+describe('mostLikes', () => {
+  test('returns null on empty list', () => {
+    expect(mostLikes(emptyList)).toBe(null)
+  })
+  test('returns the likes of single blog list', () => {
+    expect(mostLikes(listOfOne)).toEqual({
+      author: 'Hermal Melville',
+      likes: 15
+    })
+  })
+  test('calculates and compares likes correctly for longer list', () => {
+    expect(mostLikes(longListWithDuplicates)).toEqual({
+      author: 'Hermal Melville',
+      likes: 30
+    })
+  })
+  test('returns null if all author names missing', () => {
+    expect(mostLikes(listWithMissingAuthors)).toBe(null)
   })
 })
