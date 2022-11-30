@@ -1,17 +1,13 @@
-const morgan = require('morgan')
 const logger = require('./logger')
 
-const requestLogger = morgan((tokens, req, res) => {
-  return [
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    '-',
-    tokens['response-time'](req, res),
-    'ms',
-    JSON.stringify(req.body)
-  ].join(' ')
-})
+const requestLogger = (req, res, next) => {
+  const method = req.method
+  const url = req.url
+  const body = JSON.stringify(req.body)
+  logger.info(`${method} ${url} ${body}`)
+
+  next()
+}
 
 const unknownEndpoint = (_req, res) => {
   res.status(404).send({ error: 'uknown endpoint' })
