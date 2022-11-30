@@ -1,4 +1,9 @@
-const { dummy, totalLikes, favouriteBlog } = require('../utils/list_helper')
+const {
+  dummy,
+  totalLikes,
+  favouriteBlog,
+  mostBlogs
+} = require('../utils/list_helper')
 
 const emptyList = []
 
@@ -36,6 +41,72 @@ const listOfThree = [
   }
 ]
 
+const longListWithDuplicates = [
+  {
+    title: 'Moby Dick',
+    author: 'Hermal Melville',
+    url: 'https://en.wikipedia.org/wiki/Moby-Dick',
+    likes: 15,
+    id: '63874affcb36b797cd196001'
+  },
+  {
+    title: 'Don QuiXote',
+    author: 'Miguel de Cervantes',
+    url: 'https://en.wikipedia.org/wiki/Don_Quixote',
+    likes: 21,
+    id: '63874affcb36b797cd196002'
+  },
+  {
+    title: 'The Art of War',
+    author: 'Sun Tzu',
+    url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+    likes: 4,
+    id: '63874affcb36b797cd196003'
+  },
+  {
+    title: 'Moby Dick',
+    author: 'Hermal Melville',
+    url: 'https://en.wikipedia.org/wiki/Moby-Dick',
+    likes: 15,
+    id: '63874affcb36b797cd196001'
+  },
+  {
+    title: 'The Art of War',
+    author: 'Sun Tzu',
+    url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+    likes: 4,
+    id: '63874affcb36b797cd196003'
+  },
+  {
+    title: 'The Art of War',
+    author: 'Sun Tzu',
+    url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+    likes: 4,
+    id: '63874affcb36b797cd196003'
+  }
+]
+
+const listWithMissingAuthors = [
+  {
+    title: 'Moby Dick',
+    url: 'https://en.wikipedia.org/wiki/Moby-Dick',
+    likes: 15,
+    id: '63874affcb36b797cd196001'
+  },
+  {
+    title: 'Don QuiXote',
+    url: 'https://en.wikipedia.org/wiki/Don_Quixote',
+    likes: 21,
+    id: '63874affcb36b797cd196002'
+  },
+  {
+    title: 'The Art of War',
+    url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+    likes: 4,
+    id: '63874affcb36b797cd196003'
+  }
+]
+
 describe('dummy', () => {
   test('always returns 1', () => {
     const blogs = []
@@ -67,5 +138,20 @@ describe('favouriteBlog', () => {
   })
   test('returns the most liked blog in list', () => {
     expect(favouriteBlog(listOfThree)).toEqual(listOfThree[1])
+  })
+})
+
+describe('mostBlogs', () => {
+  test('returns null on empty list', () => {
+    expect(mostBlogs(emptyList)).toBe(null)
+  })
+  test('returns the author of single item list', () => {
+    expect(mostBlogs(listOfOne)).toBe('Hermal Melville')
+  })
+  test('returns the author with most blogs', () => {
+    expect(mostBlogs(longListWithDuplicates)).toBe('Sun Tzu')
+  })
+  test('returns null if all author names missing', () => {
+    expect(mostBlogs(listWithMissingAuthors)).toBe(null)
   })
 })
