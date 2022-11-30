@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+  "title": "Intentionally faulty likes value",
+  "author": "Me",
+  "url": "https://localhost:3000",
+  "likes": "This should fail"
+}
