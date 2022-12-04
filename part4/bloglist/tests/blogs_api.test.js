@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const Blog = require('../models/blog')
-const { listOfThreeBlogs, blogMobyDick } = require('./blogs_util')
+const { listOfThreeBlogs, blogMobyDick, blogArtOfWar } = require('./blogs_util')
 const app = require('../app')
 const api = supertest(app)
 
@@ -46,6 +46,33 @@ describe('GET /api/blogs', () => {
       .expect('Content-Type', /application\/json/)
 
     expect(response.body.length).toBe(3)
+  })
+})
+
+describe('POST /api/blogs', () => {
+  test('increases blog count by one', async () => {
+    const startingBlogs = await Blog.find({})
+    expect(startingBlogs.length).toBe(0)
+
+    await api.post('/api/blogs').send(blogArtOfWar)
+
+    const endBlogs = await Blog.find({})
+    expect(endBlogs.length).toBe(1)
+  })
+
+  test('correctly saves a valid blog', async () => {
+    const response = await api
+      .post('/api/blogs')
+      .send(blogArtOfWar)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const savedBlog = response.body
+    expect(savedBlog.title).toBe('The Art of War')
+    expect(savedBlog.author).toBe('Sun Tzu')
+    expect(savedBlog.url).toBe('https://en.wikipedia.org/wiki/The_Art_of_War')
+    expect(savedBlog.likes).toBe(4)
+    expect(savedBlog.id).toBeDefined()
   })
 })
 

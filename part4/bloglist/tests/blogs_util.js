@@ -5,6 +5,13 @@ const blogMobyDick = {
   likes: 15
 }
 
+const blogArtOfWar = {
+  title: 'The Art of War',
+  author: 'Sun Tzu',
+  url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+  likes: 4
+}
+
 const listOfThreeBlogs = [
   {
     title: 'Moby Dick',
@@ -26,4 +33,4 @@ const listOfThreeBlogs = [
   }
 ]
 
-module.exports = { listOfThreeBlogs, blogMobyDick }
+module.exports = { listOfThreeBlogs, blogMobyDick, blogArtOfWar }
