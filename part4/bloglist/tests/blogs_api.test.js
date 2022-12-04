@@ -19,7 +19,7 @@ describe('GET /api/blogs', () => {
     expect(response.body.length).toBe(0)
   })
 
-  test('returns one saved blog correctly', async () => {
+  test('returns one saved blog correctly with an ID field', async () => {
     await new Blog(blogMobyDick).save()
 
     const response = await api
@@ -33,6 +33,7 @@ describe('GET /api/blogs', () => {
     expect(blog.author).toBe('Hermal Melville')
     expect(blog.url).toBe('https://en.wikipedia.org/wiki/Moby-Dick')
     expect(blog.likes).toBe(15)
+    expect(blog.id).toBeDefined()
   })
 
   test('returns a list of 3 blogs', async () => {
