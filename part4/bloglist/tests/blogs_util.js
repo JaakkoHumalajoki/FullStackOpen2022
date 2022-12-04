@@ -1,3 +1,5 @@
+const Blog = require('../models/blog')
+
 const blogMobyDick = {
   title: 'Moby Dick',
   author: 'Hermal Melville',
@@ -33,4 +35,11 @@ const listOfThreeBlogs = [
   }
 ]
 
-module.exports = { listOfThreeBlogs, blogMobyDick, blogArtOfWar }
+const getNonexistantId = async () => {
+  const blog = new Blog(blogMobyDick)
+  await blog.save()
+  await blog.remove()
+  return blog._id
+}
+
+module.exports = { listOfThreeBlogs, blogMobyDick, blogArtOfWar, getNonexistantId }

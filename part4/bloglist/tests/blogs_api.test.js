@@ -1,7 +1,12 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const Blog = require('../models/blog')
-const { listOfThreeBlogs, blogMobyDick, blogArtOfWar } = require('./blogs_util')
+const {
+  listOfThreeBlogs,
+  blogMobyDick,
+  blogArtOfWar,
+  getNonexistantId
+} = require('./blogs_util')
 const app = require('../app')
 const api = supertest(app)
 
@@ -46,6 +51,35 @@ describe('GET /api/blogs', () => {
       .expect('Content-Type', /application\/json/)
 
     expect(response.body.length).toBe(3)
+  })
+})
+
+describe('GET /api/blogs/:id', () => {
+  test('Nonexistant ID returns 404', async () => {
+    const id = await getNonexistantId()
+
+    await api.get(`/api/blogs/${id}`).expect(404)
+  })
+
+  test('gibberish ID returns 400', async () => {
+    const id = 'ThisShouldGiveCastError'
+
+    await api.get(`/api/blogs/${id}`).expect(400)
+  })
+
+  test('returns the correct blog by ID', async () => {
+    const blogPromises = listOfThreeBlogs.map((blog) => new Blog(blog).save())
+    await Promise.all(blogPromises)
+    const blogs = await Blog.find({})
+    const correctBlog = blogs[1].toJSON()
+    correctBlog.id = correctBlog.id.toString()
+
+    const response = await api
+      .get(`/api/blogs/${correctBlog.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body).toEqual(correctBlog)
   })
 })
 
