@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const express = require('express')
 const cors = require('cors')
+require('express-async-errors')
 const { MONGO_URL } = require('./utils/config')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
