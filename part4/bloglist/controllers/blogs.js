@@ -13,7 +13,7 @@ blogsRouter.get('/:id', async (req, res) => {
   res.status(200).json(blog)
 })
 
-blogsRouter.post('/', async (req, res, next) => {
+blogsRouter.post('/', async (req, res) => {
   const blog = new Blog({
     title: req.body.title,
     author: req.body.author,
@@ -23,6 +23,15 @@ blogsRouter.post('/', async (req, res, next) => {
 
   const savedBlog = await blog.save()
   res.status(201).json(savedBlog)
+})
+
+blogsRouter.delete('/:id', async (req, res) => {
+  const id = req.params.id
+  const foundBlog = await Blog.findById(id)
+  if (!foundBlog) return res.status(404).end()
+
+  await Blog.findByIdAndRemove(id)
+  res.status(204).end()
 })
 
 module.exports = blogsRouter

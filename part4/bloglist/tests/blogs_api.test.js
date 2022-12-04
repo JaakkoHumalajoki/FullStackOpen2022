@@ -141,6 +141,37 @@ describe('POST /api/blogs', () => {
   })
 })
 
+describe('DELETE /api/blogs/:id', () => {
+  test('should fail with 404 using nonexistant id', async () => {
+    const id = await getNonexistantId()
+
+    await api.delete(`/api/blogs/${id}`).expect(404)
+  })
+
+  test('gibberish ID returns 400', async () => {
+    const id = 'ThisShouldGiveCastError'
+
+    await api.delete(`/api/blogs/${id}`).expect(400)
+  })
+
+  test('removes the correct blog from list', async () => {
+    const blogPromises = listOfThreeBlogs.map((blog) => new Blog(blog).save())
+    await Promise.all(blogPromises)
+
+    const initialBlogs = await Blog.find({})
+    expect(initialBlogs.length).toBe(3)
+    const targetBlog = initialBlogs[1]
+    expect(targetBlog.title).toBe('Don Quixote')
+
+    await api.delete(`/api/blogs/${targetBlog.id}`).expect(204)
+
+    const endBlogs = await Blog.find({})
+    expect(endBlogs.length).toBe(2)
+    expect(endBlogs[0].title).toBe('Moby Dick')
+    expect(endBlogs[1].title).toBe('The Art of War')
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

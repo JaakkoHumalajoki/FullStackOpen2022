@@ -22,7 +22,7 @@ const listOfThreeBlogs = [
     likes: 15
   },
   {
-    title: 'Don QuiXote',
+    title: 'Don Quixote',
     author: 'Miguel de Cervantes',
     url: 'https://en.wikipedia.org/wiki/Don_Quixote',
     likes: 21
