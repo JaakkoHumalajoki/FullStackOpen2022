@@ -85,6 +85,26 @@ describe('POST /api/blogs', () => {
     expect(savedBlogs.length).toBe(1)
     expect(savedBlogs[0].likes).toBe(0)
   })
+
+  test('should fail with missing title', async () => {
+    const blogMissingTitle = { ...blogArtOfWar }
+    delete blogMissingTitle.title
+
+    await api.post('/api/blogs').send(blogMissingTitle).expect(400)
+  })
+
+  test('should fail with missing url', async () => {
+    const blogMissingUrl = { ...blogArtOfWar }
+    delete blogMissingUrl.url
+
+    await api.post('/api/blogs').send(blogMissingUrl).expect(400)
+  })
+
+  test('should fail with negative likes count', async () => {
+    const blogNegativeLikes = { ...blogArtOfWar, likes: -100 }
+
+    await api.post('/api/blogs').send(blogNegativeLikes).expect(400)
+  })
 })
 
 afterAll(() => {
