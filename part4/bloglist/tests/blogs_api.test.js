@@ -141,6 +141,72 @@ describe('POST /api/blogs', () => {
   })
 })
 
+describe('PUT /api/blogs/:id', () => {
+  test('fails with 404 with nonexistant id', async () => {
+    const id = await getNonexistantId()
+
+    await api.put(`/api/blogs/${id}`).send({ likes: 100 }).expect(404)
+  })
+
+  test('gibberish ID returns 400', async () => {
+    const id = 'ThisShouldGiveCastError'
+
+    await api.put(`/api/blogs/${id}`).send({ likes: 100 }).expect(400)
+  })
+
+  test('updates likes of a blog correctly', async () => {
+    await new Blog(blogMobyDick).save()
+    let blogs = await Blog.find({})
+    const initialBlog = blogs[0].toJSON()
+    expect(initialBlog.likes).toBe(15)
+
+    const response = await api
+      .put(`/api/blogs/${initialBlog.id}`)
+      .send({ likes: 100 })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.likes).toBe(100)
+
+    blogs = await Blog.find({})
+    const endBlog = blogs[0].toJSON()
+    expect(initialBlog.title).toBe(endBlog.title)
+    expect(endBlog.likes).toBe(100)
+  })
+
+  test('can update all fields simultaneously', async () => {
+    await new Blog(blogMobyDick).save()
+    const blogs = await Blog.find({})
+    const initialBlog = blogs[0].toJSON()
+
+    const updates = {
+      title: 'Testing PUT',
+      author: 'Me',
+      url: 'http://localhost:3000',
+      likes: 999
+    }
+
+    const response = await api
+      .put(`/api/blogs/${initialBlog.id}`)
+      .send(updates)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.title).toBe('Testing PUT')
+    expect(response.body.author).toBe('Me')
+    expect(response.body.url).toBe('http://localhost:3000')
+    expect(response.body.likes).toBe(999)
+  })
+
+  test('fails with a faulty likes count', async () => {
+    await new Blog(blogMobyDick).save()
+    const blogs = await Blog.find({})
+    const initialBlog = blogs[0].toJSON()
+
+    await api.put(`/api/blogs/${initialBlog.id}`).send({ likes: -100 }).expect(400)
+  })
+})
+
 describe('DELETE /api/blogs/:id', () => {
   test('should fail with 404 using nonexistant id', async () => {
     const id = await getNonexistantId()
