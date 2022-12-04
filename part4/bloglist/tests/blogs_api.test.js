@@ -74,6 +74,17 @@ describe('POST /api/blogs', () => {
     expect(savedBlog.likes).toBe(4)
     expect(savedBlog.id).toBeDefined()
   })
+
+  test('missing likes count defaults to zero', async () => {
+    const blogMissingLikes = { ...blogArtOfWar }
+    delete blogMissingLikes.likes
+
+    await api.post('/api/blogs').send(blogMissingLikes)
+
+    const savedBlogs = await Blog.find({})
+    expect(savedBlogs.length).toBe(1)
+    expect(savedBlogs[0].likes).toBe(0)
+  })
 })
 
 afterAll(() => {
