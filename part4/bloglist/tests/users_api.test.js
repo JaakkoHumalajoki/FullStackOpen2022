@@ -75,4 +75,13 @@ describe('POST /api/users', () => {
     const databaseEnd = await User.find({})
     expect(databaseEnd.length).toBe(0)
   })
+
+  test('user creation fails with duplicate username', async () => {
+    await api.post('/api/users').send(userTeekkari).expect(201)
+    const duplicate = { ...userTeekkari, name: 'Tero Teekkari' }
+    await api.post('/api/users').send(duplicate).expect(400)
+
+    const databaseEnd = await User.find({})
+    expect(databaseEnd.length).toBe(1)
+  })
 })

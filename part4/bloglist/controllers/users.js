@@ -9,6 +9,11 @@ usersRouter.get('/', async (_req, res) => {
 })
 
 usersRouter.post('/', async (req, res) => {
+  const existingUser = await User.findOne({ username: req.body.username })
+  if (existingUser) {
+    return res.status(400).json({ error: 'Username already taken' })
+  }
+
   if (!req.body.password) {
     return res.status(400).json({ error: 'Missing password' })
   }
