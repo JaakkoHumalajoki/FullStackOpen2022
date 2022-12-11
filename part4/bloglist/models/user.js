@@ -5,7 +5,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: 3,
-    maxLength: 20
+    maxLength: 20,
+    validate: {
+      validator: (v) => {
+        return /^\w*$/.test(v)
+      }
+    }
   },
   name: {
     type: String,

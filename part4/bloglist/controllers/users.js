@@ -9,6 +9,32 @@ usersRouter.get('/', async (_req, res) => {
 })
 
 usersRouter.post('/', async (req, res) => {
+  if (!req.body.password) {
+    return res.status(400).json({ error: 'Missing password' })
+  }
+  if (req.body.password.length < 8) {
+    return res
+      .status(400)
+      .json({ error: 'Password must be a minimum 8 characters long' })
+  }
+  if (req.body.password.length > 50) {
+    return res
+      .status(400)
+      .json({ error: 'Password too long (max 50 characters)' })
+  }
+  if (!/^\w{8,50}$/.test(req.body.password)) {
+    return res
+      .status(400)
+      .json({ error: 'Password must only contain alphanumeric characters' })
+  }
+  if (
+    !/[a-zA-Z]+/.test(req.body.password) ||
+    !/[0-9]+/.test(req.body.password)
+  ) {
+    return res
+      .status(400)
+      .json({ error: 'Password must contain both letters and numbers' })
+  }
   const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
 
   const userData = {

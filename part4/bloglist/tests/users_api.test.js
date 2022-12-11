@@ -47,4 +47,30 @@ describe('POST /api/users', () => {
     const databaseEnd = await User.find({})
     expect(databaseEnd.length).toBe(1)
   })
+
+  test('requests fail with status 400 on faulty inputs', async () => {
+    let faultyUser = { ...userTeekkari, username: 'a' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, username: '!"%!%&!=&' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, name: 'b' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, password: undefined }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, password: 'short1' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, password: 'lackingNumber' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    faultyUser = { ...userTeekkari, password: '¤&!25afd%=adf##%' }
+    await api.post('/api/users').send(faultyUser).expect(400)
+
+    const databaseEnd = await User.find({})
+    expect(databaseEnd.length).toBe(0)
+  })
 })
