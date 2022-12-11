@@ -48,14 +48,16 @@ describe('POST /api/users', () => {
     expect(databaseEnd.length).toBe(1)
   })
 
+  test('allows missing name to be saved', async () => {
+    const user = { username: 'anonymous', password: 'password1234' }
+    await api.post('/api/users').send(user).expect(201)
+  })
+
   test('requests fail with status 400 on faulty inputs', async () => {
     let faultyUser = { ...userTeekkari, username: 'a' }
     await api.post('/api/users').send(faultyUser).expect(400)
 
     faultyUser = { ...userTeekkari, username: '!"%!%&!=&' }
-    await api.post('/api/users').send(faultyUser).expect(400)
-
-    faultyUser = { ...userTeekkari, name: 'b' }
     await api.post('/api/users').send(faultyUser).expect(400)
 
     faultyUser = { ...userTeekkari, password: undefined }
