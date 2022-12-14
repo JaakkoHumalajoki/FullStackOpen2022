@@ -1,10 +1,16 @@
 const logger = require('./logger')
 
-const requestLogger = (req, res, next) => {
+const requestLogger = (req, _res, next) => {
   const method = req.method
   const url = req.url
-  const body = JSON.stringify(req.body)
-  logger.info(`${method} ${url} ${body}`)
+  const body = { ...req.body }
+  // ensuring passwords aren't logged
+  if (body.password) {
+    delete body.password
+  }
+  const bodyString = JSON.stringify(body)
+
+  logger.info(`${method} ${url} ${bodyString}`)
 
   next()
 }
