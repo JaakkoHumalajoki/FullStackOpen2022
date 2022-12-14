@@ -21,7 +21,7 @@ loginRouter.post('/', async (req, res) => {
   }
 
   const userForToken = {
-    user: user.username,
+    username: user.username,
     id: user._id
   }
 
