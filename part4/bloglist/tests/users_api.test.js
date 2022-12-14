@@ -2,7 +2,7 @@ const supertest = require('supertest')
 const User = require('../models/user')
 const app = require('../app')
 const api = supertest(app)
-const { userTeekkari } = require('./users_util')
+const { userTeekkari, getNonexistantId } = require('./users_util')
 
 beforeEach(async () => {
   await User.deleteMany({})
@@ -81,5 +81,21 @@ describe('POST /api/users', () => {
 
     const databaseEnd = await User.find({})
     expect(databaseEnd.length).toBe(1)
+  })
+})
+
+describe('DELETE /api/users', () => {
+  test('responds with 404 to nonexisting user id', async () => {
+    const wrongId = await getNonexistantId()
+    await api.delete(`/api/users/${wrongId}`).expect(404)
+  })
+
+  test('correctly removes a user from database', async () => {
+    const savedUser = await new User(userTeekkari).save()
+
+    await api.delete(`/api/users/${savedUser._id}`).expect(204)
+
+    const users = await User.find({})
+    expect(users.length).toBe(0)
   })
 })

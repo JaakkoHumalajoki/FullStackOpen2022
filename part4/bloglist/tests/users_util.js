@@ -1,3 +1,5 @@
+const User = require('../models/user')
+
 const userTeekkari = {
   username: 'teekkari',
   name: 'Teemu Teekkari',
@@ -26,4 +28,11 @@ const listOfThreeUsers = [
   }
 ]
 
-module.exports = { userTeekkari, listOfThreeUsers }
+const getNonexistantId = async () => {
+  const user = new User(userTeekkari)
+  await user.save()
+  await user.remove()
+  return user._id
+}
+
+module.exports = { userTeekkari, listOfThreeUsers, getNonexistantId }
