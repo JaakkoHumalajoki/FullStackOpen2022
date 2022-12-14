@@ -10,9 +10,7 @@ beforeEach(async () => {
 
 describe('GET /api/users', () => {
   test('gets a user from the database', async () => {
-    const user = new User(userTeekkari)
-    const savedUser = await user.save()
-    console.log(savedUser)
+    await new User(userTeekkari).save()
 
     const response = await api
       .get('/api/users')
