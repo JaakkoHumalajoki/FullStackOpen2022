@@ -1,14 +1,18 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (_req, res) => {
-  const blogs = await Blog.find({}).populate('user')
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   res.json(blogs)
 })
 
 blogsRouter.get('/:id', async (req, res) => {
   const id = req.params.id
-  const blog = await Blog.findById(id).populate('user')
+  const blog = await Blog.findById(id).populate('user', {
+    username: 1,
+    name: 1
+  })
   if (!blog) return res.status(404).end()
   res.status(200).json(blog)
 })
@@ -22,7 +26,15 @@ blogsRouter.post('/', async (req, res) => {
     user: req.body.user
   })
 
+  // TODO: Check that user exists first
   const savedBlog = await blog.save()
+
+  if (req.body.user) {
+    const user = await User.findById(req.body.user)
+    const blogs = [...user.blogs, savedBlog._id]
+    await User.findByIdAndUpdate(req.body.user, { blogs })
+  }
+
   res.status(201).json(savedBlog)
 })
 
