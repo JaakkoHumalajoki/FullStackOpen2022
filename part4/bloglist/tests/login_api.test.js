@@ -16,16 +16,16 @@ beforeAll(async () => {
 describe('POST /api/login', () => {
   test('returns status 400 on faulty requests', async () => {
     let faultyLogin = { username: 'WrongAccount', password }
-    await api.post('/api/login').send(faultyLogin).expect(400)
+    await api.post('/api/login').send(faultyLogin).expect(401)
 
     faultyLogin = { username, password: 'WrongPassword' }
-    await api.post('/api/login').send(faultyLogin).expect(400)
+    await api.post('/api/login').send(faultyLogin).expect(401)
 
     faultyLogin = { username }
-    await api.post('/api/login').send(faultyLogin).expect(400)
+    await api.post('/api/login').send(faultyLogin).expect(401)
 
     faultyLogin = { password }
-    await api.post('/api/login').send(faultyLogin).expect(400)
+    await api.post('/api/login').send(faultyLogin).expect(401)
   })
 
   test('returns a valid token on successful login', async () => {
