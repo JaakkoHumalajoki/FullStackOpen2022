@@ -5,5 +5,6 @@ content-type: application/json
   "title": "Moby Dick",
   "author": "Hermal Melville",
   "url": "https://en.wikipedia.org/wiki/Moby-Dick",
-  "likes": 15
+  "likes": 15,
+  "user": "6399a99889a1e6a4ec55dcf4"
 }

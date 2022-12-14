@@ -7,8 +7,18 @@ const {
   blogArtOfWar,
   getNonexistantId
 } = require('./blogs_util')
+const User = require('../models/user')
+const { userTeekkari } = require('./users_util')
 const app = require('../app')
 const api = supertest(app)
+
+let userId = ''
+
+beforeAll(async () => {
+  await User.deleteMany({})
+  const savedUser = await new User(userTeekkari).save()
+  userId = savedUser._id
+})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -39,6 +49,24 @@ describe('GET /api/blogs', () => {
     expect(blog.url).toBe('https://en.wikipedia.org/wiki/Moby-Dick')
     expect(blog.likes).toBe(15)
     expect(blog.id).toBeDefined()
+  })
+
+  test('Blog includes user info', async () => {
+    const newBlog = { ...blogMobyDick, user: userId }
+    await new Blog(newBlog).save()
+
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.length).toBe(1)
+    const blog = response.body[0]
+    expect(blog.user).toBeDefined()
+    expect(blog.user.username).toBe(userTeekkari.username)
+    expect(blog.user.name).toBe(userTeekkari.name)
+    expect(blog.user.id).toBeDefined()
+    expect(blog.user.passwordHash).toBe(undefined)
   })
 
   test('returns a list of 3 blogs', async () => {
@@ -203,7 +231,10 @@ describe('PUT /api/blogs/:id', () => {
     const blogs = await Blog.find({})
     const initialBlog = blogs[0].toJSON()
 
-    await api.put(`/api/blogs/${initialBlog.id}`).send({ likes: -100 }).expect(400)
+    await api
+      .put(`/api/blogs/${initialBlog.id}`)
+      .send({ likes: -100 })
+      .expect(400)
   })
 })
 
