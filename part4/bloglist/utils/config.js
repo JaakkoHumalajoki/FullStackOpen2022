@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const PORT = process.env.PORT || 3003
 const NODE_ENV = process.env.NODE_ENV
+const LOGIN_SECRET = process.env.LOGIN_SECRET
 
 let MONGO_URL = ''
 switch (NODE_ENV) {
@@ -15,4 +16,4 @@ switch (NODE_ENV) {
     MONGO_URL = process.env.MONGO_TEST_URL
 }
 
-module.exports = { MONGO_URL, PORT, NODE_ENV }
+module.exports = { MONGO_URL, PORT, NODE_ENV, LOGIN_SECRET }
