@@ -1,6 +1,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const { LOGIN_SECRET } = require('../utils/config')
 
 blogsRouter.get('/', async (_req, res) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -18,22 +20,34 @@ blogsRouter.get('/:id', async (req, res) => {
 })
 
 blogsRouter.post('/', async (req, res) => {
+  const token = req.token
+  if (!token) {
+    return res.status(401).json({ error: 'missing token' })
+  }
+
+  const userInfo = jwt.verify(token, LOGIN_SECRET)
+  if (!userInfo.id || !userInfo.username) {
+    return res.status(401).json({ error: 'invalid token' })
+  }
+
+  const user = await User.findById(userInfo.id)
+  if (!user) {
+    return res
+      .status(400)
+      .json({ error: 'your account been deleted from database' })
+  }
+
   const blog = new Blog({
     title: req.body.title,
     author: req.body.author,
     url: req.body.url,
     likes: req.body.likes || 0,
-    user: req.body.user
+    user: userInfo.id
   })
 
-  // TODO: Check that user exists first
   const savedBlog = await blog.save()
-
-  if (req.body.user) {
-    const user = await User.findById(req.body.user)
-    const blogs = [...user.blogs, savedBlog._id]
-    await User.findByIdAndUpdate(req.body.user, { blogs })
-  }
+  const blogs = [...user.blogs, savedBlog._id]
+  await User.findByIdAndUpdate(userInfo.id, { blogs })
 
   res.status(201).json(savedBlog)
 })

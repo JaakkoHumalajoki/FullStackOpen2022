@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs
 content-type: application/json
+authorization: Bearer token-here
 
 {
   "title": "Moby Dick",
   "author": "Hermal Melville",
   "url": "https://en.wikipedia.org/wiki/Moby-Dick",
-  "likes": 15,
-  "user": "6399a99889a1e6a4ec55dcf4"
+  "likes": 15
 }
