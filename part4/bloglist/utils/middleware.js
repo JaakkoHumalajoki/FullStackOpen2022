@@ -1,4 +1,7 @@
 const logger = require('./logger')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const { LOGIN_SECRET } = require('./config')
 
 const requestLogger = (req, _res, next) => {
   const method = req.method
@@ -20,7 +23,23 @@ const tokenExtractor = (req, _res, next) => {
   if (auth && auth.toLowerCase().startsWith('bearer ')) {
     req.token = auth.substring(7)
   }
+  next()
+}
 
+const userExtractor = async (req, res, next) => {
+  if (!req.token) {
+    return res.status(401).json({ error: 'missing token' })
+  }
+
+  const userInfo = jwt.verify(req.token, LOGIN_SECRET)
+  const user = await User.findById(userInfo.id)
+  if (!user) {
+    return res
+      .status(400)
+      .json({ error: 'your account been deleted from database' })
+  }
+
+  req.user = user
   next()
 }
 
@@ -50,6 +69,7 @@ const errorHandler = (err, _req, res, next) => {
 module.exports = {
   requestLogger,
   tokenExtractor,
+  userExtractor,
   unknownEndpoint,
   errorHandler
 }
