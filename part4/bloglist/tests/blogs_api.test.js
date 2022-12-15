@@ -207,6 +207,18 @@ describe('POST /api/blogs', () => {
       .send(blogNegativeLikes)
       .expect(400)
   })
+
+  test('returns status 401 on missing token', async () => {
+    await api.post('/api/blogs').send(blogMobyDick).expect(401)
+  })
+
+  test('returns status 401 on faulty token', async () => {
+    await api
+      .post('/api/blogs')
+      .set('authorization', 'Bearer gibberish')
+      .send(blogMobyDick)
+      .expect(401)
+  })
 })
 
 describe('PUT /api/blogs/:id', () => {
@@ -293,6 +305,26 @@ describe('PUT /api/blogs/:id', () => {
       .send({ likes: -100 })
       .expect(400)
   })
+
+  test('returns status 401 if missing token', async () => {
+    const newBlog = { ...blogMobyDick, user: userId }
+    const savedBlog = await new Blog(newBlog).save()
+    const blogId = savedBlog._id
+
+    await api.put(`/api/blogs/${blogId}`).send({ likes: 999 }).expect(401)
+  })
+
+  test('returns status 401 if wrong user attempts update', async () => {
+    const newBlog = { ...blogMobyDick, user: userId }
+    const savedBlog = await new Blog(newBlog).save()
+    const blogId = savedBlog._id
+
+    await api
+      .put(`/api/blogs/${blogId}`)
+      .set('authorization', `Bearer ${secondaryToken}`)
+      .send({ likes: 999 })
+      .expect(401)
+  })
 })
 
 describe('DELETE /api/blogs/:id', () => {
@@ -324,7 +356,6 @@ describe('DELETE /api/blogs/:id', () => {
     const initialBlogs = await Blog.find({})
     expect(initialBlogs.length).toBe(3)
     const targetBlog = initialBlogs[1]
-    expect(targetBlog.title).toBe('Don Quixote')
 
     await api
       .delete(`/api/blogs/${targetBlog.id}`)
@@ -333,8 +364,27 @@ describe('DELETE /api/blogs/:id', () => {
 
     const endBlogs = await Blog.find({})
     expect(endBlogs.length).toBe(2)
-    expect(endBlogs[0].title).toBe('Moby Dick')
-    expect(endBlogs[1].title).toBe('The Art of War')
+    expect(endBlogs[0]).toEqual(initialBlogs[0])
+    expect(endBlogs[1]).toEqual(initialBlogs[2])
+  })
+
+  test('returns status 401 if missing token', async () => {
+    const newBlog = { ...blogMobyDick, user: userId }
+    const savedBlog = await new Blog(newBlog).save()
+    const blogId = savedBlog._id
+
+    await api.delete(`/api/blogs/${blogId}`).expect(401)
+  })
+
+  test('returns status 401 if wrong user attempts deletion', async () => {
+    const newBlog = { ...blogMobyDick, user: userId }
+    const savedBlog = await new Blog(newBlog).save()
+    const blogId = savedBlog._id
+
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .set('authorization', `Bearer ${secondaryToken}`)
+      .expect(401)
   })
 })
 
