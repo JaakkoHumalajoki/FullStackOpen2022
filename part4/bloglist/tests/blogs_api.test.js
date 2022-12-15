@@ -8,20 +8,41 @@ const {
   getNonexistantId
 } = require('./blogs_util')
 const User = require('../models/user')
-const { userTeekkari } = require('./users_util')
+const { userTeekkari, userSecondary } = require('./users_util')
 const app = require('../app')
 const api = supertest(app)
 
 let userId = ''
+let token = ''
+let secondaryUserId = ''
+let secondaryToken = ''
 
 beforeAll(async () => {
   await User.deleteMany({})
-  const savedUser = await new User(userTeekkari).save()
-  userId = savedUser._id
+  const savedUser = await api.post('/api/users').send(userTeekkari)
+  userId = savedUser.body.id
+  const loggedInUser = await api.post('/api/login').send(userTeekkari)
+  token = loggedInUser.body.token
+  const savedUser2 = await api.post('/api/users').send(userSecondary)
+  secondaryUserId = savedUser2.body.id
+  const loggedInUser2 = await api.post('/api/login').send(userSecondary)
+  secondaryToken = loggedInUser2.body.token
 })
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+})
+
+describe('Testing pre-requisites', () => {
+  test('POST /api/users gave an id', () => {
+    expect(userId).toBeDefined()
+    expect(secondaryUserId).toBeDefined()
+  })
+
+  test('POST /api/login gave a token', () => {
+    expect(token).toBeDefined()
+    expect(secondaryToken).toBeDefined()
+  })
 })
 
 describe('GET /api/blogs', () => {
@@ -116,7 +137,10 @@ describe('POST /api/blogs', () => {
     const startingBlogs = await Blog.find({})
     expect(startingBlogs.length).toBe(0)
 
-    await api.post('/api/blogs').send(blogArtOfWar)
+    await api
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
+      .send(blogArtOfWar)
 
     const endBlogs = await Blog.find({})
     expect(endBlogs.length).toBe(1)
@@ -125,6 +149,7 @@ describe('POST /api/blogs', () => {
   test('correctly saves a valid blog', async () => {
     const response = await api
       .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
       .send(blogArtOfWar)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -141,7 +166,10 @@ describe('POST /api/blogs', () => {
     const blogMissingLikes = { ...blogArtOfWar }
     delete blogMissingLikes.likes
 
-    await api.post('/api/blogs').send(blogMissingLikes)
+    await api
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
+      .send(blogMissingLikes)
 
     const savedBlogs = await Blog.find({})
     expect(savedBlogs.length).toBe(1)
@@ -152,20 +180,32 @@ describe('POST /api/blogs', () => {
     const blogMissingTitle = { ...blogArtOfWar }
     delete blogMissingTitle.title
 
-    await api.post('/api/blogs').send(blogMissingTitle).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
+      .send(blogMissingTitle)
+      .expect(400)
   })
 
   test('should fail with missing url', async () => {
     const blogMissingUrl = { ...blogArtOfWar }
     delete blogMissingUrl.url
 
-    await api.post('/api/blogs').send(blogMissingUrl).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
+      .send(blogMissingUrl)
+      .expect(400)
   })
 
   test('should fail with negative likes count', async () => {
     const blogNegativeLikes = { ...blogArtOfWar, likes: -100 }
 
-    await api.post('/api/blogs').send(blogNegativeLikes).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${token}`)
+      .send(blogNegativeLikes)
+      .expect(400)
   })
 })
 
@@ -173,23 +213,34 @@ describe('PUT /api/blogs/:id', () => {
   test('fails with 404 with nonexistant id', async () => {
     const id = await getNonexistantId()
 
-    await api.put(`/api/blogs/${id}`).send({ likes: 100 }).expect(404)
+    await api
+      .put(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ likes: 100 })
+      .expect(404)
   })
 
   test('gibberish ID returns 400', async () => {
     const id = 'ThisShouldGiveCastError'
 
-    await api.put(`/api/blogs/${id}`).send({ likes: 100 }).expect(400)
+    await api
+      .put(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ likes: 100 })
+      .expect(400)
   })
 
   test('updates likes of a blog correctly', async () => {
-    await new Blog(blogMobyDick).save()
+    const newBlog = { ...blogMobyDick, user: userId }
+    await new Blog(newBlog).save()
+
     let blogs = await Blog.find({})
     const initialBlog = blogs[0].toJSON()
     expect(initialBlog.likes).toBe(15)
 
     const response = await api
       .put(`/api/blogs/${initialBlog.id}`)
+      .set('authorization', `Bearer ${token}`)
       .send({ likes: 100 })
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -203,7 +254,9 @@ describe('PUT /api/blogs/:id', () => {
   })
 
   test('can update all fields simultaneously', async () => {
-    await new Blog(blogMobyDick).save()
+    const newBlog = { ...blogMobyDick, user: userId }
+    await new Blog(newBlog).save()
+
     const blogs = await Blog.find({})
     const initialBlog = blogs[0].toJSON()
 
@@ -216,6 +269,7 @@ describe('PUT /api/blogs/:id', () => {
 
     const response = await api
       .put(`/api/blogs/${initialBlog.id}`)
+      .set('authorization', `Bearer ${token}`)
       .send(updates)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -227,12 +281,15 @@ describe('PUT /api/blogs/:id', () => {
   })
 
   test('fails with a faulty likes count', async () => {
-    await new Blog(blogMobyDick).save()
+    const newBlog = { ...blogMobyDick, user: userId }
+    await new Blog(newBlog).save()
+
     const blogs = await Blog.find({})
     const initialBlog = blogs[0].toJSON()
 
     await api
       .put(`/api/blogs/${initialBlog.id}`)
+      .set('authorization', `Bearer ${token}`)
       .send({ likes: -100 })
       .expect(400)
   })
@@ -242,17 +299,26 @@ describe('DELETE /api/blogs/:id', () => {
   test('should fail with 404 using nonexistant id', async () => {
     const id = await getNonexistantId()
 
-    await api.delete(`/api/blogs/${id}`).expect(404)
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(404)
   })
 
   test('gibberish ID returns 400', async () => {
     const id = 'ThisShouldGiveCastError'
 
-    await api.delete(`/api/blogs/${id}`).expect(400)
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(400)
   })
 
   test('removes the correct blog from list', async () => {
-    const blogPromises = listOfThreeBlogs.map((blog) => new Blog(blog).save())
+    const blogPromises = listOfThreeBlogs.map((blog) => {
+      const blogWithUser = { ...blog, user: userId }
+      return new Blog(blogWithUser).save()
+    })
     await Promise.all(blogPromises)
 
     const initialBlogs = await Blog.find({})
@@ -260,7 +326,10 @@ describe('DELETE /api/blogs/:id', () => {
     const targetBlog = initialBlogs[1]
     expect(targetBlog.title).toBe('Don Quixote')
 
-    await api.delete(`/api/blogs/${targetBlog.id}`).expect(204)
+    await api
+      .delete(`/api/blogs/${targetBlog.id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(204)
 
     const endBlogs = await Blog.find({})
     expect(endBlogs.length).toBe(2)

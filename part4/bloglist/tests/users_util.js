@@ -7,6 +7,12 @@ const userTeekkari = {
   passwordHash: 'dummytext'
 }
 
+const userSecondary = {
+  username: 'TestAccount',
+  name: 'Test Account',
+  password: 'SafeP4ssw0rd'
+}
+
 const listOfThreeUsers = [
   {
     username: 'hellas',
@@ -35,4 +41,4 @@ const getNonexistantId = async () => {
   return user._id
 }
 
-module.exports = { userTeekkari, listOfThreeUsers, getNonexistantId }
+module.exports = { userTeekkari, userSecondary, listOfThreeUsers, getNonexistantId }
