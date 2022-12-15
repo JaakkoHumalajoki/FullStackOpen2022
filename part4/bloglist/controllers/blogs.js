@@ -34,8 +34,17 @@ blogsRouter.post('/', userExtractor, async (req, res) => {
   res.status(201).json(savedBlog)
 })
 
-blogsRouter.put('/:id', async (req, res) => {
+blogsRouter.put('/:id', userExtractor, async (req, res) => {
   const id = req.params.id
+
+  const foundBlog = await Blog.findById(id)
+  if (!foundBlog) {
+    return res.status(404).end()
+  }
+
+  if (req.user._id.toString() !== foundBlog.user.toString()) {
+    return res.status(401).json({ error: 'cannot update other users blogs' })
+  }
 
   const blog = {
     title: req.body.title,
@@ -54,10 +63,14 @@ blogsRouter.put('/:id', async (req, res) => {
   res.status(200).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id', userExtractor, async (req, res) => {
   const id = req.params.id
   const foundBlog = await Blog.findById(id)
   if (!foundBlog) return res.status(404).end()
+
+  if (req.user._id.toString() !== foundBlog.user.toString()) {
+    return res.status(401).json({ error: 'cannot delete other users blogs' })
+  }
 
   await Blog.findByIdAndRemove(id)
   res.status(204).end()

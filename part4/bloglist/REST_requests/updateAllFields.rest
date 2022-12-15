@@ -1,5 +1,6 @@
 PUT http://localhost:3003/api/blogs/638c758329d634002aa9e7c7
 content-type: application/json
+authorization: Bearer token-here
 
 {
   "title": "Testing stuff",
