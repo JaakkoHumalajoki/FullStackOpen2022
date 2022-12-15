@@ -35,7 +35,7 @@ const userExtractor = async (req, res, next) => {
   const user = await User.findById(userInfo.id)
   if (!user) {
     return res
-      .status(400)
+      .status(401)
       .json({ error: 'your account been deleted from database' })
   }
 
